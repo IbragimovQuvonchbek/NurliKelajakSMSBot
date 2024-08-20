@@ -25,17 +25,25 @@ dp = Dispatcher(storage=MemoryStorage())
 
 @dp.message(CommandStart())
 async def command_start_handler(message: types.Message) -> None:
-    await message.answer("Nomerlarni 99891402101 yoki 914021601 ko'rinishida jo'nating")
+    await message.answer("Nomerlarni 998914021601 yoki 914021601 ko'rinishida jo'nating")
 
 
 @dp.message(F.content_type == ContentType.TEXT)
 async def handler_name(message: types.Message) -> None:
     if message.text.isnumeric():
-        response = send_sms(message.text)
-        if response == 200:
-            await message.reply("sms yuborildi")
-        else:
-            await message.reply("sms yuborilishda xatolik")
+        arr = message.text.split('\n')
+        err = 0
+        corr = 0
+        for number in arr:
+            response = send_sms(number)
+
+            if response == 200:
+                corr += 1
+            else:
+                err += 1
+        await message.reply(f"{corr} ta xabar yuborild\n{err} ta xabar yuborilishda xatolik bo'ldi")
+    else:
+        await message.reply("to'g'ri tartibda yuboring")
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
